@@ -11,6 +11,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -22,11 +23,15 @@ import {
 } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, Sparkles, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import type { ConversationType } from '@/types';
 import { conversationTypeOptions } from '@/data/mock';
+import { suggestConversationSummary } from '@/ai/flows/suggest-conversation-summary';
+import type { SuggestConversationSummaryInput } from '@/ai/schemas/conversation-summary-schemas';
+import { useToast } from '@/hooks/use-toast';
+import React, { useState } from 'react';
 
 const conversationFormSchema = z.object({
   type: z.custom<ConversationType>((val) => conversationTypeOptions.includes(val as ConversationType), {
@@ -46,6 +51,10 @@ interface ConversationFormProps {
 }
 
 export function ConversationForm({ onSubmit, leadName }: ConversationFormProps) {
+  const [isSummaryLoading, setIsSummaryLoading] = useState(false);
+  const [summaryError, setSummaryError] = useState<string | null>(null);
+  const { toast } = useToast();
+
   const form = useForm<ConversationFormValues>({
     resolver: zodResolver(conversationFormSchema),
     defaultValues: {
@@ -65,6 +74,40 @@ export function ConversationForm({ onSubmit, leadName }: ConversationFormProps) 
       customNotes: '',
       followUpReminderDate: undefined,
     });
+  };
+
+  const handleSuggestSummary = async () => {
+    const currentSummary = form.getValues('summary');
+    if (!currentSummary || currentSummary.trim().length < 10) {
+      setSummaryError('Please enter at least 10 characters for the AI to summarize.');
+      toast({
+        title: 'Input Too Short',
+        description: 'Please enter at least 10 characters for the AI to summarize.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    setSummaryError(null);
+    setIsSummaryLoading(true);
+    try {
+      const input: SuggestConversationSummaryInput = { rawNotes: currentSummary };
+      const result = await suggestConversationSummary(input);
+      form.setValue('summary', result.suggestedSummary, { shouldValidate: true });
+      toast({
+        title: 'Summary Suggested',
+        description: 'AI has suggested a summary for your notes.',
+      });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
+      setSummaryError(`Failed to suggest summary: ${errorMessage}`);
+      toast({
+        title: 'AI Summary Error',
+        description: `Could not suggest summary. ${errorMessage}`,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSummaryLoading(false);
+    }
   };
 
   return (
@@ -134,11 +177,32 @@ export function ConversationForm({ onSubmit, leadName }: ConversationFormProps) 
           name="summary"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Summary</FormLabel>
+              <div className="flex justify-between items-center">
+                <FormLabel>Summary</FormLabel>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleSuggestSummary}
+                  disabled={isSummaryLoading}
+                  className="text-accent hover:text-accent/90"
+                >
+                  {isSummaryLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-1" />
+                  ) : (
+                    <Sparkles className="h-4 w-4 mr-1" />
+                  )}
+                  Suggest Summary
+                </Button>
+              </div>
               <FormControl>
-                <Textarea placeholder="Brief summary of the conversation..." {...field} />
+                <Textarea placeholder="Brief summary of the conversation, or enter notes for AI to summarize..." {...field} />
               </FormControl>
+              {summaryError && <p className="text-sm font-medium text-destructive">{summaryError}</p>}
               <FormMessage />
+              <FormDescription>
+                You can write your own summary or provide notes and click "Suggest Summary" for an AI-generated version.
+              </FormDescription>
             </FormItem>
           )}
         />

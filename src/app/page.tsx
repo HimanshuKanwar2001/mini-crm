@@ -14,7 +14,8 @@ import type { Lead, Conversation, LeadStatus } from '@/types';
 import type { LeadFormValues } from '@/components/leads/LeadForm';
 import type { ConversationFormValues } from '@/components/conversations/ConversationForm';
 import { mockLeads } from '@/data/mock'; 
-import { suggestNextSteps, type SuggestNextStepsInput } from '@/ai/flows/suggest-next-steps';
+import { suggestNextSteps } from '@/ai/flows/suggest-next-steps';
+import type { SuggestNextStepsInput } from '@/ai/schemas/next-steps-schemas';
 import { PlusCircle, RefreshCw, List, LayoutGrid } from 'lucide-react';
 
 export default function HomePage() {

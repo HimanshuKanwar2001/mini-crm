@@ -3,31 +3,19 @@
  * @fileOverview AI-powered next step suggestion for leads.
  *
  * - suggestNextSteps - A function that suggests the next steps for a lead.
- * - SuggestNextStepsInput - The input type for the suggestNextSteps function.
- * - SuggestNextStepsOutput - The return type for the suggestNextSteps function.
+ *   Input and Output types are defined in '@/ai/schemas/next-steps-schemas.ts'.
  */
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 import {LinkedInProfile, getLinkedInProfile} from '@/services/linkedin';
+import {
+  SuggestNextStepsInputSchema,
+  type SuggestNextStepsInput,
+  SuggestNextStepsOutputSchema,
+  type SuggestNextStepsOutput,
+} from '@/ai/schemas/next-steps-schemas';
 
-const SuggestNextStepsInputSchema = z.object({
-  leadName: z.string().describe('The name of the lead.'),
-  leadEmail: z.string().email().describe('The email address of the lead.'),
-  leadLinkedInProfileUrl: z.string().url().optional().or(z.literal('')).describe('The LinkedIn profile URL of the lead.'),
-  company: z.string().optional().describe('The company the lead works for.'),
-  notes: z.string().optional().describe('Any notes about the lead.'),
-  tags: z.array(z.string()).describe('Tags associated with the lead.'),
-  communicationHistory: z.string().describe('A summary of past communications with the lead.'),
-});
-export type SuggestNextStepsInput = z.infer<typeof SuggestNextStepsInputSchema>;
-
-const SuggestNextStepsOutputSchema = z.object({
-  nextSteps: z.array(
-    z.string().describe('A specific, actionable next step for the lead.')
-  ).describe('The list of next steps suggested for the lead based on their information. Should contain 3-5 suggestions.'),
-});
-export type SuggestNextStepsOutput = z.infer<typeof SuggestNextStepsOutputSchema>;
 
 export async function suggestNextSteps(input: SuggestNextStepsInput): Promise<SuggestNextStepsOutput> {
   return suggestNextStepsFlow(input);
@@ -39,15 +27,10 @@ const linkedInProfileTool = ai.defineTool({
   inputSchema: z.object({
     profileUrl: z.string().url().describe('The URL of the LinkedIn profile to retrieve data from.'),
   }),
-  outputSchema: z.object({ // This schema should match the return type of getLinkedInProfile
+  outputSchema: z.object({ 
     profileUrl: z.string().url().describe('The URL of the LinkedIn profile.'),
-    // Add other fields here if getLinkedInProfile returns them, e.g., summary, experience, etc.
-    // For now, it only returns profileUrl as per src/services/linkedin.ts
   }),
   async resolve(input) {
-    // The getLinkedInProfile function currently returns a simple object: { profileUrl: string }
-    // If it were to return more complex data, this tool's outputSchema and the function's return type
-    // would need to be updated accordingly.
     return await getLinkedInProfile(input.profileUrl);
   },
 });
@@ -99,10 +82,6 @@ const suggestNextStepsFlow = ai.defineFlow(
     if (!output) {
       throw new Error('AI did not return an output.');
     }
-    // The output from the prompt should now directly match SuggestNextStepsOutputSchema
-    // thanks to the updated system prompt and output.schema definition.
     return output;
   }
 );
-
-
