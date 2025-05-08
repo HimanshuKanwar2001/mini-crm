@@ -69,3 +69,4 @@ export const mockLeads: Lead[] = [
     conversations: [],
   },
 ];
+
