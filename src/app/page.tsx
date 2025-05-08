@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -7,13 +8,14 @@ import { AddEditLeadDialog } from '@/components/leads/AddEditLeadDialog';
 import { ConversationDialog } from '@/components/conversations/ConversationDialog';
 import { AISuggestionsDialog } from '@/components/ai/AISuggestionsDialog';
 import { FilterControls } from '@/components/leads/FilterControls';
+import { KanbanBoard } from '@/components/leads/KanbanBoard'; 
 import { useToast } from '@/hooks/use-toast';
 import type { Lead, Conversation, LeadStatus } from '@/types';
 import type { LeadFormValues } from '@/components/leads/LeadForm';
 import type { ConversationFormValues } from '@/components/conversations/ConversationForm';
-import { mockLeads } from '@/data/mock'; // Using mock data
+import { mockLeads } from '@/data/mock'; 
 import { suggestNextSteps, type SuggestNextStepsInput } from '@/ai/flows/suggest-next-steps';
-import { PlusCircle, RefreshCw } from 'lucide-react';
+import { PlusCircle, RefreshCw, List, LayoutGrid } from 'lucide-react';
 
 export default function HomePage() {
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -28,11 +30,11 @@ export default function HomePage() {
   const [isAddLeadDialogOpen, setIsAddLeadDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<LeadStatus | 'all'>('all');
+  const [viewMode, setViewMode] = useState<'table' | 'kanban'>('table');
 
   const { toast } = useToast();
 
   useEffect(() => {
-    // Load leads from local storage or use mock data
     const storedLeads = localStorage.getItem('leads');
     if (storedLeads) {
       setLeads(JSON.parse(storedLeads));
@@ -50,14 +52,14 @@ export default function HomePage() {
 
   const handleSaveLead = (values: LeadFormValues, id?: string) => {
     const processedTags = values.tags ? values.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [];
-    if (id) { // Editing existing lead
+    if (id) { 
       setLeads(leads.map(lead => 
         lead.id === id ? { ...lead, ...values, tags: processedTags, updatedAt: new Date().toISOString() } : lead
       ));
       toast({ title: "Lead Updated", description: `${values.name} has been updated successfully.` });
-    } else { // Adding new lead
+    } else { 
       const newLead: Lead = {
-        id: String(Date.now()), // Simple ID generation
+        id: String(Date.now()), 
         ...values,
         tags: processedTags,
         status: values.status,
@@ -68,8 +70,8 @@ export default function HomePage() {
       setLeads([newLead, ...leads]);
       toast({ title: "Lead Added", description: `${values.name} has been added successfully.` });
     }
-    setEditingLead(null); // Close dialog after save
-    setIsAddLeadDialogOpen(false); // Ensure add dialog closes too
+    setEditingLead(null); 
+    setIsAddLeadDialogOpen(false); 
   };
 
   const handleDeleteLead = (leadId: string) => {
@@ -122,8 +124,9 @@ export default function HomePage() {
       setAiSuggestions(result.nextSteps);
     } catch (error) {
       console.error("AI Suggestion Error:", error);
-      setAiError("Failed to fetch AI suggestions. Please try again.");
-      toast({ title: "AI Error", description: "Could not fetch suggestions.", variant: "destructive" });
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
+      setAiError(`Failed to fetch AI suggestions: ${errorMessage}`);
+      toast({ title: "AI Error", description: `Could not fetch suggestions. ${errorMessage}`, variant: "destructive" });
     } finally {
       setIsAiLoading(false);
     }
@@ -158,13 +161,21 @@ export default function HomePage() {
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
         <h1 className="text-3xl font-bold tracking-tight text-foreground">My Leads</h1>
-        <AddEditLeadDialog onSave={handleSaveLead} open={isAddLeadDialogOpen} onOpenChange={setIsAddLeadDialogOpen} 
-         triggerButton={
-            <Button onClick={() => { setEditingLead(null); setIsAddLeadDialogOpen(true); }}>
-              <PlusCircle className="mr-2 h-4 w-4" /> Add New Lead
-            </Button>
-          }
-        />
+        <div className="flex gap-2 items-center">
+          <Button variant={viewMode === 'table' ? 'default' : 'outline'} onClick={() => setViewMode('table')} size="sm">
+            <List className="mr-2 h-4 w-4" /> Table
+          </Button>
+          <Button variant={viewMode === 'kanban' ? 'default' : 'outline'} onClick={() => setViewMode('kanban')} size="sm">
+            <LayoutGrid className="mr-2 h-4 w-4" /> Kanban
+          </Button>
+          <AddEditLeadDialog onSave={handleSaveLead} open={isAddLeadDialogOpen} onOpenChange={setIsAddLeadDialogOpen} 
+          triggerButton={
+              <Button onClick={() => { setEditingLead(null); setIsAddLeadDialogOpen(true); }}>
+                <PlusCircle className="mr-2 h-4 w-4" /> Add Lead
+              </Button>
+            }
+          />
+        </div>
       </div>
 
       <FilterControls
@@ -174,22 +185,34 @@ export default function HomePage() {
         onStatusFilterChange={setStatusFilter}
       />
 
-      <LeadTable
-        leads={filteredLeads}
-        onEditLead={(lead) => { setEditingLead(lead); setIsAddLeadDialogOpen(true); }}
-        onDeleteLead={handleDeleteLead}
-        onViewConversations={setViewingConversationsLead}
-        onGetAISuggestions={(lead) => {
-          setAiSuggestionsLead(lead);
-          // handleGetAISuggestions(lead); // Fetch on open through useEffect in AISuggestionsDialog
-        }}
-      />
+      {viewMode === 'table' ? (
+        <LeadTable
+          leads={filteredLeads}
+          onEditLead={(lead) => { setEditingLead(lead); setIsAddLeadDialogOpen(true); }}
+          onDeleteLead={handleDeleteLead}
+          onViewConversations={setViewingConversationsLead}
+          onGetAISuggestions={(lead) => {
+            setAiSuggestionsLead(lead);
+          }}
+        />
+      ) : (
+        <KanbanBoard
+          leads={filteredLeads}
+          onEditLead={(lead) => { setEditingLead(lead); setIsAddLeadDialogOpen(true); }}
+          onDeleteLead={handleDeleteLead}
+          onViewConversations={setViewingConversationsLead}
+          onGetAISuggestions={(lead) => {
+            setAiSuggestionsLead(lead);
+          }}
+        />
+      )}
+
 
       {editingLead && (
         <AddEditLeadDialog
           lead={editingLead}
           onSave={handleSaveLead}
-          open={isAddLeadDialogOpen && !!editingLead} // only open if editingLead is set
+          open={isAddLeadDialogOpen && !!editingLead} 
           onOpenChange={(open) => {
             if (!open) setEditingLead(null);
             setIsAddLeadDialogOpen(open);
