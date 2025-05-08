@@ -1,5 +1,4 @@
 
-
 export const LEAD_STATUSES = ["New", "Contacted", "Qualified", "Proposal Sent", "Converted", "Lost"] as const;
 export type LeadStatus = typeof LEAD_STATUSES[number];
 
@@ -34,3 +33,20 @@ export interface Conversation {
   createdAt: string; // ISO string date
 }
 
+export const ACTIVITY_TYPES = ["LEAD_CREATED", "LEAD_UPDATED", "STATUS_CHANGED", "CONVERSATION_LOGGED", "LEAD_DELETED"] as const;
+export type ActivityType = typeof ACTIVITY_TYPES[number];
+
+export interface Activity {
+  id: string;
+  timestamp: string; // ISO string date
+  type: ActivityType;
+  description: string;
+  leadId: string;
+  leadName: string;
+  details?: {
+    oldValue?: string | string[];
+    newValue?: string | string[];
+    fieldName?: string;
+    conversationType?: ConversationType;
+  };
+}
