@@ -31,7 +31,9 @@ Before you begin, ensure you have the following installed on your system:
 
 - **Node.js**: Version 18.x or later (LTS recommended). You can download it from [nodejs.org](https://nodejs.org/).
 - **npm** (comes with Node.js) or **yarn**: A package manager for JavaScript.
-- **MongoDB**: Version 4.x or later. You can install it locally or use a cloud-hosted service like MongoDB Atlas. Download MongoDB Community Server from [mongodb.com](https://www.mongodb.com/try/download/community).
+- **MongoDB**: You can use a cloud-hosted service like MongoDB Atlas (recommended) or install MongoDB Community Server locally (Version 4.x or later).
+  - For MongoDB Atlas, sign up at [cloud.mongodb.com](https://cloud.mongodb.com/).
+  - For local installation, download MongoDB Community Server from [mongodb.com](https://www.mongodb.com/try/download/community).
 - **Google AI API Key**: To use the AI-powered features, you will need an API key from Google AI Studio (for Gemini models). You can get one [here](https://makersuite.google.com/app/apikey).
 
 ## Environment Setup
@@ -44,15 +46,17 @@ Before you begin, ensure you have the following installed on your system:
 
     ```env
     GOOGLE_API_KEY=your_google_ai_api_key_here
-    MONGODB_URI=mongodb://localhost:27017
+    MONGODB_URI=mongodb+srv://<your_username>:<your_password>@<your_cluster_address>/<your_database_name>?retryWrites=true&w=majority
     MONGODB_DB_NAME=crm-database
     ```
 
     - Replace `your_google_ai_api_key_here` with the actual API key you obtained from Google AI Studio.
-    - `MONGODB_URI`: This is the connection string for your MongoDB instance. `mongodb://localhost:27017` is the default for a local MongoDB installation. If you're using a different setup (e.g., MongoDB Atlas), update this accordingly.
-    - `MONGODB_DB_NAME`: The name of the database LeadPilot AI will use. `crm-database` is the new default.
+    - **`MONGODB_URI`**:
+        - **For MongoDB Atlas (Recommended)**: Replace `<your_username>`, `<your_password>`, `<your_cluster_address>`, and `<your_database_name>` with your actual MongoDB Atlas credentials and cluster information. Ensure your Atlas cluster's IP whitelist allows connections from your IP address or `0.0.0.0/0` (for development, be cautious with this in production). The `<your_database_name>` in the URI should match `MONGODB_DB_NAME`.
+        - **For Local MongoDB**: If you choose to use a local MongoDB instance, the URI would be something like `mongodb://localhost:27017`. If your local MongoDB requires authentication, include credentials: `mongodb://user:password@localhost:27017`.
+    - **`MONGODB_DB_NAME`**: The name of the database LeadPilot AI will use. `crm-database` is the default. This name should also be used in your `MONGODB_URI` if you are using MongoDB Atlas.
 
-    *Note: If MongoDB is running locally and requires authentication, or if you are using a cloud service, your `MONGODB_URI` will be different (e.g., `mongodb+srv://user:password@cluster.mongodb.net/`).*
+    **Important**: After creating or modifying the `.env` file, you **must restart your Next.js development server** for the changes to take effect.
 
 ## Installation
 
@@ -81,8 +85,8 @@ Before you begin, ensure you have the following installed on your system:
 
 The application consists of two main parts: the Next.js frontend and the Genkit AI flow server. You'll need to run them in separate terminal windows.
 
-1.  **Start your MongoDB Server**:
-    Ensure your MongoDB instance is running. If you installed MongoDB locally, you might start it with a command like `mongod` (this command can vary based on your OS and installation method). If you are using a cloud service like MongoDB Atlas, it should already be running.
+1.  **Start your MongoDB Server (if using local MongoDB)**:
+    If you installed MongoDB locally, ensure your MongoDB instance is running. You might start it with a command like `mongod` (this command can vary based on your OS and installation method). If you are using a cloud service like MongoDB Atlas, it should already be running.
 
 2.  **Start the Genkit Development Server**:
     This server handles the AI-powered flows.
@@ -94,7 +98,7 @@ The application consists of two main parts: the Next.js frontend and the Genkit 
     ```bash
     npm run genkit:watch
     ```
-    By default, the Genkit server usually starts on port `3400` (unless configured otherwise, but for this project, the default port is expected). The Genkit UI will be available at `http://localhost:4000/dev-ui`.
+    By default, the Genkit server usually starts on port `3400`. The Genkit UI will be available at `http://localhost:4000/dev-ui`.
 
 3.  **Start the Next.js Development Server**:
     This server runs the main web application.
@@ -102,7 +106,7 @@ The application consists of two main parts: the Next.js frontend and the Genkit 
     ```bash
     npm run dev
     ```
-    The Next.js application will start on `http://localhost:9002` (as specified in `package.json`).
+    The Next.js application will start on `http://localhost:9002` (as specified in `package.json`). **Remember to restart this server if you change environment variables in `.env`**.
 
 4.  **Access the Application**:
     Open your web browser and navigate to `http://localhost:9002`.
@@ -150,7 +154,7 @@ Here's a brief overview of the key directories:
 - **TypeScript**: Superset of JavaScript for type safety.
 - **Tailwind CSS**: Utility-first CSS framework for styling.
 - **ShadCN UI**: Reusable UI components built with Radix UI and Tailwind CSS.
-- **MongoDB**: NoSQL document database for data persistence.
+- **MongoDB**: NoSQL document database for data persistence (MongoDB Atlas recommended).
 - **`mongodb` (Node.js Driver)**: For interacting with MongoDB.
 - **Genkit (Firebase Genkit)**: Toolkit for building AI-powered features, integrated with Google AI (Gemini).
 - **Zod**: TypeScript-first schema declaration and validation library.
@@ -158,4 +162,3 @@ Here's a brief overview of the key directories:
 - **Lucide React**: Icon library.
 - **Recharts**: Composable charting library (used for the dashboard).
 - **date-fns**: For date formatting.
-```
