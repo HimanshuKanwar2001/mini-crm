@@ -5,7 +5,9 @@ import type { Lead } from '@/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { LeadActions } from './LeadActions';
-import { Mail, Briefcase, GripVertical } from 'lucide-react';
+import { Mail, Briefcase } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import * as React from 'react';
 
 interface LeadCardProps {
   lead: Lead;
@@ -22,13 +24,32 @@ export function LeadCard({
   onViewConversations,
   onGetAISuggestions,
 }: LeadCardProps) {
+  const [isDragging, setIsDragging] = React.useState(false);
+
+  const handleDragStart = (event: React.DragEvent<HTMLDivElement>) => {
+    event.dataTransfer.setData('leadId', lead.id);
+    event.dataTransfer.setData('currentStatus', lead.status);
+    event.dataTransfer.effectAllowed = "move";
+    setIsDragging(true);
+  };
+
+  const handleDragEnd = () => {
+    setIsDragging(false);
+  };
+
   return (
-    <Card className="shadow-md hover:shadow-lg transition-shadow duration-200 bg-card">
+    <Card 
+      draggable={true}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+      className={cn(
+        "shadow-md hover:shadow-lg transition-all duration-200 bg-card cursor-grab",
+        isDragging && "opacity-50 ring-2 ring-accent dragging"
+      )}
+    >
       <CardHeader className="pb-3">
         <div className="flex justify-between items-start">
           <CardTitle className="text-lg font-semibold text-foreground">{lead.name}</CardTitle>
-          {/* Optional: Drag handle icon for future dnd */}
-          {/* <GripVertical className="h-5 w-5 text-muted-foreground cursor-grab" /> */}
         </div>
         {lead.company && (
           <CardDescription className="flex items-center text-sm text-muted-foreground">
@@ -44,7 +65,7 @@ export function LeadCard({
         </div>
         {lead.tags && lead.tags.length > 0 && (
           <div className="flex flex-wrap gap-1 pt-1">
-            {lead.tags.slice(0, 3).map((tag, index) => ( // Show max 3 tags
+            {lead.tags.slice(0, 3).map((tag, index) => ( 
               <Badge key={`${lead.id}-tag-${index}`} variant="secondary" className="text-xs">
                 {tag}
               </Badge>

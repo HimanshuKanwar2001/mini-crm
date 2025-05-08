@@ -132,6 +132,23 @@ export default function HomePage() {
     }
   };
 
+  const handleUpdateLeadStatus = (leadId: string, newStatus: LeadStatus) => {
+    setLeads(prevLeads =>
+      prevLeads.map(lead =>
+        lead.id === leadId
+          ? { ...lead, status: newStatus, updatedAt: new Date().toISOString() }
+          : lead
+      )
+    );
+    const leadBeingUpdated = leads.find(l => l.id === leadId);
+    if (leadBeingUpdated) {
+      toast({
+        title: "Lead Status Updated",
+        description: `${leadBeingUpdated.name}'s status changed to ${newStatus}.`,
+      });
+    }
+  };
+
 
   const filteredLeads = useMemo(() => {
     return leads.filter(lead => {
@@ -204,6 +221,7 @@ export default function HomePage() {
           onGetAISuggestions={(lead) => {
             setAiSuggestionsLead(lead);
           }}
+          onLeadStatusChange={handleUpdateLeadStatus}
         />
       )}
 

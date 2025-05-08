@@ -108,3 +108,12 @@
     /* font-family removed to allow Geist from layout.tsx to take precedence */
   }
 }
+
+@layer components {
+  .dragging {
+    @apply opacity-50 ring-2 ring-accent shadow-xl;
+  }
+  .drag-over-column {
+    @apply bg-accent/10 border-accent border-dashed;
+  }
+}
