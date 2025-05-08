@@ -73,7 +73,7 @@ export default function HomePage() {
       leadName: leadData.name,
       details,
     };
-    setActivities(prevActivities => [newActivity, ...prevActivities].slice(0, 200)); // Keep last 200 activities
+    setActivities(prevActivities => [newActivity, ...prevActivities]); 
   };
 
   const handleSaveLead = (values: LeadFormValues, id?: string) => {
@@ -307,3 +307,4 @@ export default function HomePage() {
     </div>
   );
 }
+
