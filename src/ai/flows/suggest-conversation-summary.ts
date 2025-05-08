@@ -16,7 +16,19 @@ import {
 
 
 export async function suggestConversationSummary(input: SuggestConversationSummaryInput): Promise<SuggestConversationSummaryOutput> {
-  return suggestConversationSummaryFlow(input);
+  try {
+    return await suggestConversationSummaryFlow(input);
+  } catch (e) {
+    console.error('[AI Flow Error - suggestConversationSummary]:', e);
+    if (e instanceof Error && e.message.toLowerCase().includes('fetch')) {
+        throw new Error('AI summarization service is currently unavailable. Please ensure the Genkit server is running or check your network connection to AI services.');
+    }
+    // Re-throw other errors or a generic one for the client to catch
+    if (e instanceof Error) {
+      throw new Error(`An error occurred while suggesting a conversation summary: ${e.message}`);
+    }
+    throw new Error('An unknown error occurred while suggesting a conversation summary.');
+  }
 }
 
 const prompt = ai.definePrompt({

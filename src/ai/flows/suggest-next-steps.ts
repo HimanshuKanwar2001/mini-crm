@@ -18,7 +18,19 @@ import {
 
 
 export async function suggestNextSteps(input: SuggestNextStepsInput): Promise<SuggestNextStepsOutput> {
-  return suggestNextStepsFlow(input);
+  try {
+    return await suggestNextStepsFlow(input);
+  } catch (e) {
+    console.error('[AI Flow Error - suggestNextSteps]:', e);
+    if (e instanceof Error && e.message.toLowerCase().includes('fetch')) {
+        throw new Error('AI suggestion service is currently unavailable. Please ensure the Genkit server is running or check your network connection to AI services.');
+    }
+     // Re-throw other errors or a generic one for the client to catch
+    if (e instanceof Error) {
+      throw new Error(`An error occurred while suggesting next steps: ${e.message}`);
+    }
+    throw new Error('An unknown error occurred while suggesting next steps.');
+  }
 }
 
 const linkedInProfileTool = ai.defineTool({
@@ -80,7 +92,7 @@ const suggestNextStepsFlow = ai.defineFlow(
   async input => {
     const {output} = await prompt(input);
     if (!output) {
-      throw new Error('AI did not return an output.');
+      throw new Error('AI did not return an output for next steps.');
     }
     return output;
   }
