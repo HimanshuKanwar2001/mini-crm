@@ -1,4 +1,4 @@
-import { Briefcase, LayoutDashboard } from 'lucide-react';
+import { Briefcase, LayoutDashboard, ListChecks } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
@@ -12,7 +12,13 @@ const AppHeader = () => {
             LeadPilot AI
           </span>
         </Link>
-        <nav>
+        <nav className="flex items-center gap-2">
+          <Button variant="ghost" asChild>
+            <Link href="/" className="flex items-center gap-2 text-sm">
+              <ListChecks className="h-5 w-5" />
+              Leads
+            </Link>
+          </Button>
           <Button variant="ghost" asChild>
             <Link href="/dashboard" className="flex items-center gap-2 text-sm">
               <LayoutDashboard className="h-5 w-5" />
@@ -26,3 +32,4 @@ const AppHeader = () => {
 };
 
 export default AppHeader;
+
