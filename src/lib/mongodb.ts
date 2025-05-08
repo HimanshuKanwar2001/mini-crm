@@ -3,7 +3,7 @@ import { MongoClient, Db, Collection, ObjectId, Document } from 'mongodb';
 import type { Lead, Activity } from '@/types';
 
 const uri = process.env.MONGODB_URI;
-const dbName = process.env.MONGODB_DB_NAME || 'leadpilot_ai';
+const dbName = process.env.MONGODB_DB_NAME || 'crm-database';
 
 if (!uri) {
   throw new Error('Please define the MONGODB_URI environment variable inside .env file');
@@ -62,3 +62,4 @@ export function mapMongoDocument<T extends { _id?: ObjectId; id?: string }>(doc:
   const idString = _id ? _id.toHexString() : (rest.id || new ObjectId().toHexString());
   return { ...rest, id: idString } as Omit<T, '_id'> & { id: string };
 }
+

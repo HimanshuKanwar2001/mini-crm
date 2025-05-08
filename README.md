@@ -44,13 +44,13 @@ Before you begin, ensure you have the following installed on your system:
 
     ```env
     GOOGLE_API_KEY=your_google_ai_api_key_here
-    MONGODB_URI=mongodb://localhost:27017 
-    MONGODB_DB_NAME=leadpilot_ai
+    MONGODB_URI=mongodb://localhost:27017
+    MONGODB_DB_NAME=crm-database
     ```
 
     - Replace `your_google_ai_api_key_here` with the actual API key you obtained from Google AI Studio.
     - `MONGODB_URI`: This is the connection string for your MongoDB instance. `mongodb://localhost:27017` is the default for a local MongoDB installation. If you're using a different setup (e.g., MongoDB Atlas), update this accordingly.
-    - `MONGODB_DB_NAME`: The name of the database LeadPilot AI will use. `leadpilot_ai` is a good default.
+    - `MONGODB_DB_NAME`: The name of the database LeadPilot AI will use. `crm-database` is the new default.
 
     *Note: If MongoDB is running locally and requires authentication, or if you are using a cloud service, your `MONGODB_URI` will be different (e.g., `mongodb+srv://user:password@cluster.mongodb.net/`).*
 
