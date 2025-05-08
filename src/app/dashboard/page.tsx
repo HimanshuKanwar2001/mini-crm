@@ -1,28 +1,35 @@
+
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import type { Lead, LeadStatus } from '@/types';
-import { mockLeads, leadStatusOptions } from '@/data/mock';
+import type { Lead } from '@/types';
+import { leadStatusOptions } from '@/data/mock';
 import { StatsCard } from '@/components/dashboard/StatsCard';
 import { LeadsByStatusChart } from '@/components/dashboard/LeadsByStatusChart';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { RefreshCw, Users, TrendingUp, TrendingDown, BarChartBig } from 'lucide-react';
+import { getLeads } from '@/actions/leadActions'; // Import server action
+import { useToast } from '@/hooks/use-toast';
 
 export default function DashboardPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [isMounted, setIsMounted] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
-    const storedLeads = localStorage.getItem('leads');
-    if (storedLeads) {
-      setLeads(JSON.parse(storedLeads));
-    } else {
-      // Fallback to mockLeads if no leads in localStorage
-      // This could be removed if we ensure leads are always populated from HomePage
-      setLeads(mockLeads); 
+    async function loadLeads() {
+      try {
+        const leadsData = await getLeads();
+        setLeads(leadsData);
+      } catch (error) {
+        console.error("Failed to load leads for dashboard:", error);
+        toast({ title: "Error", description: "Failed to load lead data from server.", variant: "destructive" });
+        setLeads([]);
+      }
+      setIsMounted(true);
     }
-    setIsMounted(true);
-  }, []);
+    loadLeads();
+  }, [toast]);
 
   const stats = useMemo(() => {
     if (!leads || leads.length === 0) {
@@ -100,7 +107,7 @@ export default function DashboardPage() {
           <CardDescription>Distribution of leads across different statuses.</CardDescription>
         </CardHeader>
         <CardContent>
-          {stats.leadsByStatusData.length > 0 ? (
+          {stats.leadsByStatusData.length > 0 && stats.totalLeads > 0 ? (
             <LeadsByStatusChart data={stats.leadsByStatusData} />
           ) : (
             <p className="text-muted-foreground text-center py-8">No lead data available to display chart.</p>

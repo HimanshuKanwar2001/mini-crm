@@ -8,8 +8,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
-import { RefreshCw, Search, History, Info, FilePenLine, Route, MessageSquare, UserPlus, UserMinus, CalendarClock } from 'lucide-react';
+import { RefreshCw, Search, History, Info, FilePenLine, Route, MessageSquare, UserPlus, UserMinus } from 'lucide-react';
 import Link from 'next/link';
+import { getActivities } from '@/actions/activityActions'; // Import server action
+import { useToast } from '@/hooks/use-toast';
 
 // Helper function to get icon based on activity type
 const getActivityIcon = (type: Activity['type']) => {
@@ -28,28 +30,26 @@ export default function ActivityLogPage() {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isMounted, setIsMounted] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
-    const storedActivities = localStorage.getItem('activitiesLog');
-    if (storedActivities) {
+    async function loadActivities() {
       try {
-        const parsedActivities = JSON.parse(storedActivities);
-        if (Array.isArray(parsedActivities)) {
-          setActivities(parsedActivities);
-        } else {
-          setActivities([]); // Set to empty if not an array
-        }
+        const activitiesData = await getActivities();
+        setActivities(activitiesData);
       } catch (error) {
-        console.error("Failed to parse activities from localStorage:", error);
-        setActivities([]); // Set to empty on error
+        console.error("Failed to load activities:", error);
+        toast({ title: "Error", description: "Failed to load activities from server.", variant: "destructive" });
+        setActivities([]);
       }
+      setIsMounted(true);
     }
-    setIsMounted(true);
-  }, []);
+    loadActivities();
+  }, [toast]);
 
 
   const filteredActivities = useMemo(() => {
-    if (!activities) return []; // Ensure activities is not null/undefined
+    if (!activities) return []; 
     if (!searchTerm) return activities;
     const lowerSearchTerm = searchTerm.toLowerCase();
     return activities.filter(activity =>
@@ -155,4 +155,3 @@ export default function ActivityLogPage() {
     </div>
   );
 }
-

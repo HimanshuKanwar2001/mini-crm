@@ -6,11 +6,11 @@ export const CONVERSATION_TYPES = ["Email", "Call", "LinkedIn Message", "Meeting
 export type ConversationType = typeof CONVERSATION_TYPES[number];
 
 export interface Tag {
-  id: string;
+  id: string; // Assuming tags might be stored separately later, using string ID
   name: string;
 }
 export interface Lead {
-  id: string;
+  id: string; // MongoDB _id will be converted to string 'id'
   name: string;
   email: string;
   linkedinProfileUrl?: string;
@@ -24,7 +24,7 @@ export interface Lead {
 }
 
 export interface Conversation {
-  id: string;
+  id: string; // MongoDB ObjectId for subdocuments can also be string
   type: ConversationType;
   date: string; // ISO string date
   summary: string;
@@ -37,11 +37,11 @@ export const ACTIVITY_TYPES = ["LEAD_CREATED", "LEAD_UPDATED", "STATUS_CHANGED",
 export type ActivityType = typeof ACTIVITY_TYPES[number];
 
 export interface Activity {
-  id: string;
+  id: string; // MongoDB _id will be converted to string 'id'
   timestamp: string; // ISO string date
   type: ActivityType;
   description: string;
-  leadId: string;
+  leadId: string; // Store the string representation of the Lead's ObjectId
   leadName: string;
   details?: {
     oldValue?: string | string[];
