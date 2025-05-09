@@ -34,14 +34,14 @@ export function ConversationDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md md:max-w-lg lg:max-w-xl w-[90vw] max-h-[90vh] flex flex-col p-4 sm:p-6">
+      <DialogContent className="w-[90vw] max-w-sm p-4 sm:p-6 sm:max-w-md md:max-w-lg lg:max-w-xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Manage Conversations</DialogTitle>
           <DialogDescription>
             Log new communications and view past interactions with {lead.name}.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex-grow overflow-y-auto pr-2 space-y-6">
+        <div className="flex-grow overflow-y-auto pr-2 space-y-6"> {/* Keep pr-2 for scrollbar visibility if content overflows */}
           <ConversationList conversations={lead.conversations} leadName={lead.name} />
           <Separator />
           <ConversationForm onSubmit={handleLogConversation} leadName={lead.name} />
@@ -50,4 +50,3 @@ export function ConversationDialog({
     </Dialog>
   );
 }
-

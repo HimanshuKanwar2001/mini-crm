@@ -44,7 +44,7 @@ export function AISuggestionsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[525px]">
+      <DialogContent className="w-[90vw] max-w-sm p-4 sm:p-6 sm:max-w-[525px]">
         <DialogHeader>
           <DialogTitle className="flex items-center">
             <Lightbulb className="h-5 w-5 mr-2 text-accent" />

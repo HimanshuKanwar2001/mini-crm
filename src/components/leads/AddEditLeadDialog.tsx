@@ -44,16 +44,11 @@ export function AddEditLeadDialog({
     </Button>
   );
 
-  // Keying the DialogContent by lead?.id ensures the form inside LeadForm fully re-renders and resets
-  // when the lead prop changes, which is crucial for proper default value setting.
-  // However, LeadForm now uses useEffect to reset, so keying DialogContent might be redundant
-  // unless specific DialogContent state itself needs resetting.
-  // For now, relying on LeadForm's useEffect.
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {triggerButton && <DialogTrigger asChild>{triggerButton}</DialogTrigger>}
       {!triggerButton && !open && <DialogTrigger asChild>{defaultTrigger}</DialogTrigger>}
-      <DialogContent className="sm:max-w-md md:max-w-lg lg:max-w-xl w-[90vw] max-h-[90vh] overflow-y-auto p-4 sm:p-6">
+      <DialogContent className="w-[90vw] max-w-sm p-4 sm:p-6 sm:max-w-md md:max-w-lg lg:max-w-xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{isEditing ? 'Edit Lead' : 'Add New Lead'}</DialogTitle>
           <DialogDescription>
@@ -65,4 +60,3 @@ export function AddEditLeadDialog({
     </Dialog>
   );
 }
-
