@@ -81,18 +81,11 @@ export default function HomePage() {
           toast({ title: "Error", description: "Original lead not found for update.", variant: "destructive" });
           return;
         }
-        const originalStatus = originalLeadFromState.status;
-
+        
         const updatedLeadData = await updateLead(id, values);
         if (updatedLeadData) {
           setLeads(currentLeads => currentLeads.map(lead => lead.id === id ? updatedLeadData : lead));
           toast({ title: "Lead Updated", description: `${values.name} has been updated successfully.` });
-          
-          // Activity logging is now primarily handled within updateLead, but we can keep this if specific frontend context is needed
-          // await addActivityEntry("LEAD_UPDATED", updatedLeadData, `Details for lead '${updatedLeadData.name}' were updated.`);
-          // if (originalStatus !== updatedLeadData.status) {
-          //   await addActivityEntry("STATUS_CHANGED", updatedLeadData, `Status of lead '${updatedLeadData.name}' changed from '${originalStatus}' to '${updatedLeadData.status}'.`, { fieldName: 'status', oldValue: originalStatus, newValue: updatedLeadData.status });
-          // }
         } else {
           toast({ title: "Error", description: "Failed to update lead in database.", variant: "destructive" });
         }
@@ -100,8 +93,6 @@ export default function HomePage() {
         const newLeadData = await createLead(values);
         setLeads(prevLeads => [newLeadData, ...prevLeads]);
         toast({ title: "Lead Added", description: `${values.name} has been added successfully.` });
-        // Activity logging is handled by createLead
-        // await addActivityEntry("LEAD_CREATED", newLeadData, `Lead '${newLeadData.name}' was created.`);
       }
     } catch (error) {
       console.error("Error saving lead:", error);
@@ -121,8 +112,6 @@ export default function HomePage() {
         if (success) {
           setLeads(currentLeads => currentLeads.filter(lead => lead.id !== leadId));
           toast({ title: "Lead Deleted", description: `Lead '${leadToDelete.name}' has been removed.`, variant: "destructive" });
-          // Activity logging handled by deleteLeadDb
-          // await addActivityEntry("LEAD_DELETED", leadToDelete, `Lead '${leadToDelete.name}' was deleted.`);
         } else {
           toast({ title: "Error", description: "Failed to delete lead from database.", variant: "destructive" });
         }
@@ -146,10 +135,11 @@ export default function HomePage() {
         setLeads(currentLeads => currentLeads.map(lead => 
           lead.id === leadId ? updatedLead : lead
         ));
+        // Update viewingConversationsLead if it's the one being modified to reflect new convo immediately in dialog
+        if (viewingConversationsLead && viewingConversationsLead.id === leadId) {
+          setViewingConversationsLead(updatedLead);
+        }
         toast({ title: "Conversation Logged", description: `A new conversation for ${leadForConvo.name} has been logged.` });
-        // Activity logging handled by addConversationToLead
-        // const loggedConversation = updatedLead.conversations[0]; 
-        // await addActivityEntry("CONVERSATION_LOGGED", updatedLead, `A '${loggedConversation.type}' conversation was logged for lead '${updatedLead.name}'.`, { conversationType: loggedConversation.type });
       } else {
         toast({ title: "Error", description: "Failed to log conversation in database.", variant: "destructive" });
       }
@@ -216,8 +206,6 @@ export default function HomePage() {
             title: "Lead Status Updated",
             description: `${updatedLead.name}'s status changed from '${oldStatus}' to ${newStatus}.`,
         });
-        // Activity logging handled by updateLeadStatusDb
-        // await addActivityEntry("STATUS_CHANGED", updatedLead, `Status of lead '${updatedLead.name}' changed from '${oldStatus}' to '${newStatus}'.`, { fieldName: 'status', oldValue: oldStatus, newValue: newStatus });
       } else {
         toast({ title: "Error", description: "Failed to update lead status in database.", variant: "destructive" });
       }
@@ -256,7 +244,7 @@ export default function HomePage() {
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
         <h1 className="text-3xl font-bold tracking-tight text-foreground">My Leads</h1>
-        <div className="flex gap-2 items-center">
+        <div className="flex flex-wrap gap-2 items-center"> {/* Added flex-wrap here */}
           <Button variant={viewMode === 'table' ? 'default' : 'outline'} onClick={() => setViewMode('table')} size="sm">
             <List className="mr-2 h-4 w-4" /> Table
           </Button>
@@ -265,10 +253,10 @@ export default function HomePage() {
           </Button>
           <AddEditLeadDialog 
             onSave={handleSaveLead} 
-            open={isAddLeadDialogOpen && !editingLead} // Open only if adding (editingLead is null)
+            open={isAddLeadDialogOpen && !editingLead}
             onOpenChange={(open) => {
               setIsAddLeadDialogOpen(open);
-              if (!open) { // If closing, ensure editingLead is cleared if it was for an add operation
+              if (!open) {
                 setEditingLead(null);
               }
             }}
@@ -295,7 +283,7 @@ export default function HomePage() {
           onDeleteLead={handleDeleteLead}
           onViewConversations={setViewingConversationsLead}
           onGetAISuggestions={(lead) => {
-            setAiSuggestionsLead(lead); // This already opens the AISuggestionsDialog
+            setAiSuggestionsLead(lead); 
           }}
         />
       ) : (
@@ -305,7 +293,7 @@ export default function HomePage() {
           onDeleteLead={handleDeleteLead}
           onViewConversations={setViewingConversationsLead}
           onGetAISuggestions={(lead) => {
-            setAiSuggestionsLead(lead); // This already opens the AISuggestionsDialog
+            setAiSuggestionsLead(lead);
           }}
           onLeadStatusChange={handleUpdateLeadStatus}
         />
@@ -316,11 +304,11 @@ export default function HomePage() {
         <AddEditLeadDialog
           lead={editingLead}
           onSave={handleSaveLead}
-          open={isAddLeadDialogOpen && !!editingLead} // Open only if editing (editingLead is not null)
+          open={isAddLeadDialogOpen && !!editingLead} 
           onOpenChange={(open) => {
             setIsAddLeadDialogOpen(open);
             if (!open) {
-              setEditingLead(null); // Clear editingLead when dialog is closed
+              setEditingLead(null);
             }
           }}
         />

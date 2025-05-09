@@ -98,17 +98,17 @@ export default function ActivityLogPage() {
           </CardContent>
         </Card>
       ) : (
-        <ScrollArea className="h-[calc(100vh-16rem)] rounded-md border shadow-lg bg-card"> {/* Adjusted height */}
+        <ScrollArea className="h-[calc(100vh-16rem)] rounded-md border shadow-lg bg-card">
           <div className="space-y-4 p-4">
             {filteredActivities.map(activity => (
               <Card key={activity.id} className="shadow-sm hover:shadow-md transition-shadow bg-background">
                 <CardHeader className="pb-3 pt-4">
-                  <div className="flex justify-between items-start gap-2">
-                    <CardTitle className="text-lg font-semibold flex items-center text-foreground">
+                  <div className="flex flex-col sm:flex-row justify-between items-start gap-x-2 gap-y-1">
+                    <CardTitle className="text-lg font-semibold flex items-center text-foreground flex-grow">
                       {getActivityIcon(activity.type)}
                       <span className="ml-2">{activity.type.replace(/_/g, ' ')}</span>
                     </CardTitle>
-                    <span className="text-sm text-muted-foreground whitespace-nowrap">
+                    <span className="text-xs sm:text-sm text-muted-foreground sm:whitespace-nowrap flex-shrink-0">
                       {format(new Date(activity.timestamp), 'MMM dd, yyyy - hh:mm a')}
                     </span>
                   </div>
