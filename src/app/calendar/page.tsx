@@ -23,13 +23,13 @@ const CustomDayContent: React.FC<{
   selectedEventId?: string;
 }> = ({ date, displayMonth, eventsForDay, onSelectEvent, selectedEventId }) => {
   if (!isSameMonth(date, displayMonth)) {
-    return <div className="text-muted-foreground opacity-50">{format(date, 'd')}</div>;
+    return <div className="text-muted-foreground opacity-50 p-2">{format(date, 'd')}</div>;
   }
   return (
-    <div className="flex flex-col h-full">
-      <span className="self-start mb-1 text-base">{format(date, 'd')}</span>
+    <div className="flex flex-col h-full p-2"> {/* Added padding to cell content */}
+      <span className="self-start mb-1 text-lg font-medium">{format(date, 'd')}</span> {/* Increased day number size */}
       {eventsForDay.length > 0 && (
-        <ScrollArea className="flex-grow h-32"> {/* Max height for event list, adjusted from h-20 */}
+        <ScrollArea className="flex-grow h-40"> {/* Increased height for event list scroll area */}
           <div className="space-y-1 pr-1">
             {eventsForDay.map((event) => (
               <FollowUpEventItem
@@ -192,7 +192,7 @@ export default function CalendarPage() {
       <Card className="shadow-lg">
         <CardContent className="p-0 sm:p-2 md:p-4">
           <ScrollArea className="w-full">
-            <div style={{ minWidth: "1400px" }}>
+            <div style={{ minWidth: "1600px" }}> {/* Increased min-width */}
               <Calendar
                 mode="single" 
                 selected={targetDateForMove || undefined} 
@@ -201,20 +201,20 @@ export default function CalendarPage() {
                 onMonthChange={setCurrentMonth}
                 className="p-0 w-full [&_table]:w-full [&_table]:border-collapse"
                 classNames={{
-                  months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 justify-center",
-                  caption_label: "text-xl font-medium", 
+                  months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 justify-center mb-4", // Added margin bottom for caption
+                  caption_label: "text-xl font-bold", // Increased caption font size
                   head_row: "flex mt-4 w-full",
-                  head_cell: "w-[14.2857%] text-muted-foreground rounded-md p-2 text-base font-medium", 
+                  head_cell: "w-[14.2857%] text-muted-foreground rounded-md p-2 text-lg font-medium", // Increased head cell font size
                   row: "flex w-full mt-2",
-                  cell: "w-[14.2857%] h-40 text-sm p-0 relative [&:has([aria-selected])]:bg-accent/20 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20 border border-border", 
-                  day: "h-full w-full p-2 focus:relative focus:z-20 flex flex-col items-start justify-start hover:bg-accent/10 rounded-none", 
+                  cell: "w-[14.2857%] h-52 text-sm p-0 relative [&:has([aria-selected])]:bg-accent/20 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20 border border-border", // Increased cell height to h-52
+                  day: "h-full w-full p-0 focus:relative focus:z-20 flex flex-col items-start justify-start hover:bg-accent/10 rounded-none", // Removed padding from day, will be handled by CustomDayContent
                   day_selected: "bg-accent/30 text-accent-foreground font-bold",
                   day_today: "bg-muted font-bold text-foreground",
                   day_outside: "text-muted-foreground opacity-50 day-outside",
                   day_disabled: "text-muted-foreground opacity-50 cursor-not-allowed",
                   day_has_event: "font-semibold", 
                   day_selected_event_original: "ring-2 ring-primary ring-inset", 
-                  table: "w-full border-collapse", // Explicitly ensuring table takes full width of its wide parent
+                  table: "w-full border-collapse", 
                 }}
                 modifiers={modifiers}
                 modifiersClassNames={modifiersClassNames}
