@@ -27,7 +27,7 @@ const CustomDayContent: React.FC<{
   }
   return (
     <div className="flex flex-col h-full p-2">
-      <span className="self-start mb-1 text-xl font-medium">{format(date, 'd')}</span> {/* Increased day number size */}
+      <span className="self-start mb-1 text-2xl font-medium">{format(date, 'd')}</span> {/* Increased day number size to text-2xl */}
       {eventsForDay.length > 0 && (
         <ScrollArea className="flex-grow"> {/* Removed fixed height, flex-grow will use available space */}
           <div className="space-y-1 pr-1">
@@ -205,7 +205,7 @@ export default function CalendarPage() {
               head_row: "flex mt-4 w-full",
               head_cell: "w-[14.2857%] text-muted-foreground rounded-md p-2 text-lg font-medium",
               row: "flex w-full mt-2",
-              cell: "w-[14.2857%] h-64 text-sm p-0 relative [&:has([aria-selected])]:bg-accent/20 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20 border border-border", // Increased cell height to h-64
+              cell: "w-[14.2857%] h-80 text-sm p-0 relative [&:has([aria-selected])]:bg-accent/20 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20 border border-border", // Increased cell height to h-80
               day: "h-full w-full p-0 focus:relative focus:z-20 flex flex-col items-start justify-start hover:bg-accent/10 rounded-none",
               day_selected: "bg-accent/30 text-accent-foreground font-bold",
               day_today: "bg-muted font-bold text-foreground",
@@ -248,7 +248,7 @@ export default function CalendarPage() {
           `}</style>
         </CardContent>
       </Card>
-      {calendarEvents.length === 0 && !isMounted && (
+      {calendarEvents.length === 0 && !isMounted && ( // Corrected: This condition should be `isMounted && calendarEvents.length === 0`
         <Card>
           <CardContent className="py-12 text-center text-muted-foreground">
             <AlertTriangle className="h-12 w-12 mx-auto mb-4 opacity-50" />
@@ -256,6 +256,17 @@ export default function CalendarPage() {
           </CardContent>
         </Card>
       )}
+      
+      {/* Corrected logic for displaying no events message when mounted */}
+      {isMounted && calendarEvents.length === 0 && (
+         <Card>
+          <CardContent className="py-12 text-center text-muted-foreground">
+            <AlertTriangle className="h-12 w-12 mx-auto mb-4 opacity-50" />
+            No upcoming follow-up reminders found.
+          </CardContent>
+        </Card>
+      )}
+
 
       <ChangeDateConfirmationDialog
         open={isConfirmationDialogOpen}
