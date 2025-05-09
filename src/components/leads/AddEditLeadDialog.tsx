@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -17,7 +18,7 @@ import { PlusCircle } from 'lucide-react';
 
 interface AddEditLeadDialogProps {
   onSave: (values: LeadFormValues, id?: string) => void;
-  lead?: Lead; // Provide for editing
+  lead?: Lead | null; // Allow null for explicitly clearing
   triggerButton?: React.ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -43,15 +44,20 @@ export function AddEditLeadDialog({
     </Button>
   );
 
+  // Keying the DialogContent by lead?.id ensures the form inside LeadForm fully re-renders and resets
+  // when the lead prop changes, which is crucial for proper default value setting.
+  // However, LeadForm now uses useEffect to reset, so keying DialogContent might be redundant
+  // unless specific DialogContent state itself needs resetting.
+  // For now, relying on LeadForm's useEffect.
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {triggerButton && <DialogTrigger asChild>{triggerButton}</DialogTrigger>}
       {!triggerButton && !open && <DialogTrigger asChild>{defaultTrigger}</DialogTrigger>}
-      <DialogContent className="sm:max-w-[525px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-md md:max-w-lg lg:max-w-xl w-[90vw] max-h-[90vh] overflow-y-auto p-4 sm:p-6">
         <DialogHeader>
           <DialogTitle>{isEditing ? 'Edit Lead' : 'Add New Lead'}</DialogTitle>
           <DialogDescription>
-            {isEditing ? 'Update the details for this lead.' : 'Fill in the details for the new lead.'}
+            {isEditing ? `Update the details for ${lead.name}.` : 'Fill in the details for the new lead.'}
           </DialogDescription>
         </DialogHeader>
         <LeadForm onSubmit={handleSubmit} defaultValues={lead} isEditing={isEditing} />
@@ -59,3 +65,4 @@ export function AddEditLeadDialog({
     </Dialog>
   );
 }
+

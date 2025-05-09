@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -33,7 +34,7 @@ export function ConversationDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[625px] max-h-[90vh] flex flex-col">
+      <DialogContent className="sm:max-w-md md:max-w-lg lg:max-w-xl w-[90vw] max-h-[90vh] flex flex-col p-4 sm:p-6">
         <DialogHeader>
           <DialogTitle>Manage Conversations</DialogTitle>
           <DialogDescription>
@@ -49,3 +50,4 @@ export function ConversationDialog({
     </Dialog>
   );
 }
+
