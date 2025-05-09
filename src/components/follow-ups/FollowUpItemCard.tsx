@@ -5,15 +5,16 @@ import type { FollowUpListItem } from '@/app/follow-ups/page'; // Adjusted impor
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+// import Link from 'next/link'; // No longer navigating directly
 import { format } from 'date-fns';
-import { User, MessageSquare, CalendarClock, ExternalLink } from 'lucide-react';
+import { User, MessageSquare, CalendarClock, Eye } from 'lucide-react'; // Changed ExternalLink to Eye
 
 interface FollowUpItemCardProps {
   item: FollowUpListItem;
+  onViewDetails: (leadId: string) => void;
 }
 
-export function FollowUpItemCard({ item }: FollowUpItemCardProps) {
+export function FollowUpItemCard({ item, onViewDetails }: FollowUpItemCardProps) {
   return (
     <Card className="shadow-md hover:shadow-lg transition-shadow bg-card flex flex-col h-full">
       <CardHeader className="pb-3">
@@ -36,11 +37,15 @@ export function FollowUpItemCard({ item }: FollowUpItemCardProps) {
         </p>
       </CardContent>
       <CardFooter className="pt-4 border-t">
-        <Button asChild variant="outline" size="sm" className="w-full">
-          <Link href={`/?leadId=${item.leadId}#conversation-${item.conversationId}`} title={`View conversation details for ${item.leadName}`}>
-            <ExternalLink className="mr-2 h-4 w-4" />
-            View Lead & Conversation
-          </Link>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="w-full"
+          onClick={() => onViewDetails(item.leadId)}
+          title={`View details for lead ${item.leadName}`}
+        >
+          <Eye className="mr-2 h-4 w-4" /> 
+          View Lead & Conversation
         </Button>
       </CardFooter>
     </Card>

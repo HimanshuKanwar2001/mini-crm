@@ -2,14 +2,16 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import type { Lead, Conversation, FollowUpListItem } from '@/types';
-import { getLeads } from '@/actions/leadActions';
+import type { Lead, Conversation } from '@/types'; // Removed ConversationType import as it's already in types
+import { getLeads, addConversationToLead } from '@/actions/leadActions';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { FollowUpItemCard } from '@/components/follow-ups/FollowUpItemCard';
+import { ConversationDialog } from '@/components/conversations/ConversationDialog';
+import type { ConversationFormValues } from '@/components/conversations/ConversationForm';
 import { RefreshCw, BellRing, AlertTriangle } from 'lucide-react';
-import { parseISO, startOfDay, compareAsc, isPast, isToday, isTomorrow, isFuture } from 'date-fns';
+import { parseISO, startOfDay, compareAsc, isToday, isTomorrow, isFuture } from 'date-fns';
 
 // Re-defined FollowUpListItem to avoid dependency on deleted calendar types if any
 export interface FollowUpListItem {
@@ -17,7 +19,7 @@ export interface FollowUpListItem {
   leadId: string;
   leadName: string;
   conversationId: string;
-  conversationType: ConversationType;
+  conversationType: Lead['conversations'][0]['type']; // Use ConversationType from types
   conversationSummary: string;
   followUpDate: Date; 
   originalConversation: Conversation; 
@@ -27,6 +29,8 @@ export interface FollowUpListItem {
 export default function FollowUpsPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [isMounted, setIsMounted] = useState(false);
+  const [selectedLeadForDialog, setSelectedLeadForDialog] = useState<Lead | null>(null);
+  const [isConversationDialogOpen, setIsConversationDialogOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -53,7 +57,7 @@ export default function FollowUpsPage() {
           // Only include future or today's follow-ups
           if (isFuture(followUpDate) || isToday(followUpDate)) {
             followUps.push({
-              id: `${lead.id}-${convo.id}`,
+              id: `${lead.id}-${convo.id}`, // Unique ID for the list item
               leadId: lead.id,
               leadName: lead.name,
               conversationId: convo.id,
@@ -85,6 +89,38 @@ export default function FollowUpsPage() {
     });
     return { today, tomorrow, upcoming };
   }, [upcomingFollowUps]);
+
+  const handleViewLeadDetails = (leadId: string) => {
+    const lead = leads.find(l => l.id === leadId);
+    if (lead) {
+      setSelectedLeadForDialog(lead);
+      setIsConversationDialogOpen(true);
+    } else {
+      toast({ title: "Error", description: "Lead details not found.", variant: "destructive" });
+    }
+  };
+
+  const handleLogConversationInDialog = async (leadId: string, values: ConversationFormValues) => {
+    try {
+      const updatedLead = await addConversationToLead(leadId, values);
+      if (updatedLead) {
+        // Re-fetch leads to update the list with new conversation or changed follow-up
+        const leadsData = await getLeads();
+        setLeads(leadsData);
+        // Update the selected lead in the dialog if it's the one being modified
+        if (selectedLeadForDialog && selectedLeadForDialog.id === leadId) {
+          setSelectedLeadForDialog(leadsData.find(l => l.id === leadId) || null);
+        }
+        toast({ title: "Conversation Logged", description: "Successfully logged conversation." });
+      } else {
+        toast({ title: "Error", description: "Failed to log conversation.", variant: "destructive" });
+      }
+    } catch (error) {
+      console.error("Error logging conversation from dialog:", error);
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
+      toast({ title: "Error", description: `Failed to log conversation: ${errorMessage}`, variant: "destructive" });
+    }
+  };
 
   if (!isMounted) {
     return (
@@ -118,7 +154,7 @@ export default function FollowUpsPage() {
                 <h2 className="text-2xl font-semibold mb-3 text-accent border-b pb-2">Today</h2>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {categorizedFollowUps.today.map(item => (
-                    <FollowUpItemCard key={item.id} item={item} />
+                    <FollowUpItemCard key={item.id} item={item} onViewDetails={handleViewLeadDetails} />
                   ))}
                 </div>
               </section>
@@ -128,7 +164,7 @@ export default function FollowUpsPage() {
                 <h2 className="text-2xl font-semibold mb-3 text-primary border-b pb-2">Tomorrow</h2>
                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {categorizedFollowUps.tomorrow.map(item => (
-                    <FollowUpItemCard key={item.id} item={item} />
+                    <FollowUpItemCard key={item.id} item={item} onViewDetails={handleViewLeadDetails} />
                   ))}
                 </div>
               </section>
@@ -138,7 +174,7 @@ export default function FollowUpsPage() {
                 <h2 className="text-2xl font-semibold mb-3 text-muted-foreground border-b pb-2">Upcoming</h2>
                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {categorizedFollowUps.upcoming.map(item => (
-                    <FollowUpItemCard key={item.id} item={item} />
+                    <FollowUpItemCard key={item.id} item={item} onViewDetails={handleViewLeadDetails} />
                   ))}
                 </div>
               </section>
@@ -146,6 +182,18 @@ export default function FollowUpsPage() {
           </div>
         </ScrollArea>
       )}
+
+      <ConversationDialog
+        lead={selectedLeadForDialog}
+        open={isConversationDialogOpen}
+        onOpenChange={(open) => {
+          setIsConversationDialogOpen(open);
+          if (!open) {
+            setSelectedLeadForDialog(null);
+          }
+        }}
+        onLogConversation={handleLogConversationInDialog}
+      />
     </div>
   );
 }
