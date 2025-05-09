@@ -1,4 +1,4 @@
-import { Briefcase, LayoutDashboard, ListChecks, History, CalendarDays } from 'lucide-react';
+import { Briefcase, LayoutDashboard, ListChecks, History, BellRing } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
@@ -32,9 +32,9 @@ const AppHeader = () => {
             </Link>
           </Button>
           <Button variant="ghost" asChild size="sm">
-            <Link href="/calendar" className="flex items-center gap-2 text-sm">
-              <CalendarDays className="h-5 w-5" />
-              Calendar
+            <Link href="/follow-ups" className="flex items-center gap-2 text-sm">
+              <BellRing className="h-5 w-5" />
+              Follow-ups
             </Link>
           </Button>
         </nav>
@@ -44,4 +44,3 @@ const AppHeader = () => {
 };
 
 export default AppHeader;
-

@@ -18,6 +18,7 @@ LeadPilot AI is a Next.js application designed as a mini AI-Powered Customer Rel
 - **Lead Management**: Add, edit, delete, and view leads in both table and Kanban board formats.
 - **Status Tracking**: Drag-and-drop leads between statuses on the Kanban board.
 - **Conversation Logging**: Record various types of interactions (email, call, meeting) for each lead.
+- **Follow-up Reminders**: Set and view upcoming follow-up reminders in a dedicated "Follow-ups" tab.
 - **AI-Powered Next Step Suggestions**: Get intelligent recommendations for engaging with leads.
 - **AI-Powered Conversation Summaries**: Automatically generate concise summaries from conversation notes.
 - **Activity Log**: View a comprehensive history of all actions taken within the CRM.
@@ -119,7 +120,7 @@ Here's a brief overview of the key directories:
 .
 ├── src/
 │   ├── app/                # Next.js App Router pages and layouts
-│   │   ├── (pages)/        # Page components (e.g., dashboard, activity-log)
+│   │   ├── (pages)/        # Page components (e.g., dashboard, activity-log, follow-ups)
 │   │   ├── layout.tsx      # Root layout
 │   │   └── page.tsx        # Main leads page (homepage)
 │   ├── actions/            # Server Actions for data mutation (e.g. leadActions.ts, activityActions.ts)
@@ -132,6 +133,7 @@ Here's a brief overview of the key directories:
 │   │   ├── ai/             # AI-related UI components
 │   │   ├── conversations/  # Conversation management UI
 │   │   ├── dashboard/      # Dashboard specific components
+│   │   ├── follow-ups/     # Follow-up list UI components
 │   │   ├── layout/         # Layout components (e.g., header)
 │   │   ├── leads/          # Lead management UI (table, kanban, forms)
 │   │   └── ui/             # ShadCN UI components (Button, Card, etc.)

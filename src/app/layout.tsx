@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'LeadPilot AI',
-  description: 'Mini AI-Powered CRM Platform',
+  title: 'LeadPilot AI - CRM & Follow-ups',
+  description: 'Mini AI-Powered CRM Platform with Follow-up Management',
 };
 
 export default function RootLayout({

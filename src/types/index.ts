@@ -52,14 +52,14 @@ export interface Activity {
   };
 }
 
-// Specific type for events on the calendar page
-export interface CalendarFollowUpEvent {
-  id: string; // Combination of leadId and conversationId for uniqueness
-  leadId: string;
-  leadName: string;
-  conversationId: string;
-  conversationType: ConversationType;
-  conversationSummary: string; 
-  date: Date; // Date object for easier manipulation with react-day-picker
-  originalData: Conversation; // Keep original conversation data if needed
-}
+// This type will be defined locally in the follow-ups page or a specific component file for follow-ups.
+// export interface FollowUpListItem {
+//   id: string; 
+//   leadId: string;
+//   leadName: string;
+//   conversationId: string;
+//   conversationType: ConversationType;
+//   conversationSummary: string; 
+//   followUpDate: Date; 
+//   originalConversation: Conversation; 
+// }
