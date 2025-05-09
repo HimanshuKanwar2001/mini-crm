@@ -104,19 +104,19 @@ export default function ActivityLogPage() {
               <Card key={activity.id} className="shadow-sm hover:shadow-md transition-shadow bg-background">
                 <CardHeader className="pb-3 pt-4">
                   <div className="flex justify-between items-start gap-2">
-                    <CardTitle className="text-base font-semibold flex items-center text-foreground">
+                    <CardTitle className="text-lg font-semibold flex items-center text-foreground">
                       {getActivityIcon(activity.type)}
                       <span className="ml-2">{activity.type.replace(/_/g, ' ')}</span>
                     </CardTitle>
-                    <span className="text-xs text-muted-foreground whitespace-nowrap">
+                    <span className="text-sm text-muted-foreground whitespace-nowrap">
                       {format(new Date(activity.timestamp), 'MMM dd, yyyy - hh:mm a')}
                     </span>
                   </div>
-                  <CardDescription className="text-sm !mt-1">
+                  <CardDescription className="text-base !mt-1">
                     {activity.description}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="text-xs space-y-1 pt-0 pb-3">
+                <CardContent className="text-sm space-y-1 pt-0 pb-3">
                   <p>
                     <span className="font-semibold text-muted-foreground">Lead:</span>{' '}
                     <Link href={`/?leadId=${activity.leadId}#lead-${activity.leadId}`} className="text-accent hover:underline" title={`View details for lead ${activity.leadName}`}>
@@ -131,19 +131,19 @@ export default function ActivityLogPage() {
                   {activity.details?.oldValue !== undefined && (
                     <p>
                       <span className="font-semibold text-muted-foreground">Previous:</span>{' '}
-                      <Badge variant="outline" className="font-normal bg-muted/50">{String(activity.details.oldValue)}</Badge>
+                      <Badge variant="outline" className="font-normal bg-muted/50 text-sm">{String(activity.details.oldValue)}</Badge>
                     </p>
                   )}
                   {activity.details?.newValue !== undefined && (
                     <p>
                       <span className="font-semibold text-muted-foreground">New:</span>{' '}
-                      <Badge variant="secondary" className="font-normal">{String(activity.details.newValue)}</Badge>
+                      <Badge variant="secondary" className="font-normal text-sm">{String(activity.details.newValue)}</Badge>
                     </p>
                   )}
                    {activity.details?.conversationType && (
                     <p>
                       <span className="font-semibold text-muted-foreground">Type:</span>{' '}
-                      <Badge variant="outline" className="font-normal bg-muted/50">{String(activity.details.conversationType)}</Badge>
+                      <Badge variant="outline" className="font-normal bg-muted/50 text-sm">{String(activity.details.conversationType)}</Badge>
                     </p>
                   )}
                 </CardContent>
@@ -155,3 +155,4 @@ export default function ActivityLogPage() {
     </div>
   );
 }
+
