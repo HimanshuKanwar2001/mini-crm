@@ -1,4 +1,3 @@
-
 'use server';
 
 import { ObjectId, Filter, Collection, Document } from 'mongodb';
@@ -63,9 +62,15 @@ export async function updateLead(id: string, values: LeadFormValues): Promise<Le
     updatedAt: new Date().toISOString(),
   };
 
-  Object.keys(updateData).forEach(key => 
-    (updateData as any)[key] === undefined && delete (updateData as any)[key]
-  );
+  // The loop below was removed as it was redundant.
+  // Optional string fields in `values` (like linkedinProfileUrl, company, notes)
+  // are already converted to `''` if undefined by `|| ''`.
+  // Required fields (name, email, status) are guaranteed by Zod.
+  // `processedTags` is always an array. `updatedAt` is always set.
+  // Thus, no property in `updateData` will be `undefined`.
+  // Object.keys(updateData).forEach(key => 
+  //   (updateData as any)[key] === undefined && delete (updateData as any)[key]
+  // );
 
   const result = await leadsCollection.findOneAndUpdate(
     { _id: toObjectId(id) } as Filter<Lead>,
@@ -201,3 +206,4 @@ export async function updateConversationFollowUpReminder(
 
   return updatedLead;
 }
+
