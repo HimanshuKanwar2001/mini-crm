@@ -7,7 +7,7 @@ import { getLeads, updateConversationFollowUpReminder } from '@/actions/leadActi
 import { useToast } from '@/hooks/use-toast';
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'; // Updated import
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { FollowUpEventItem } from '@/components/calendar/FollowUpEventItem';
 import { ChangeDateConfirmationDialog } from '@/components/calendar/ChangeDateConfirmationDialog';
 import { format, parseISO, startOfDay, isEqual, isSameMonth } from 'date-fns';
@@ -26,10 +26,10 @@ const CustomDayContent: React.FC<{
     return <div className="text-muted-foreground opacity-50 p-2">{format(date, 'd')}</div>;
   }
   return (
-    <div className="flex flex-col h-full p-2"> {/* Added padding to cell content */}
-      <span className="self-start mb-1 text-lg font-medium">{format(date, 'd')}</span> {/* Increased day number size */}
+    <div className="flex flex-col h-full p-2">
+      <span className="self-start mb-1 text-xl font-medium">{format(date, 'd')}</span> {/* Increased day number size */}
       {eventsForDay.length > 0 && (
-        <ScrollArea className="flex-grow h-40"> {/* Increased height for event list scroll area */}
+        <ScrollArea className="flex-grow"> {/* Removed fixed height, flex-grow will use available space */}
           <div className="space-y-1 pr-1">
             {eventsForDay.map((event) => (
               <FollowUpEventItem
@@ -191,50 +191,47 @@ export default function CalendarPage() {
 
       <Card className="shadow-lg">
         <CardContent className="p-0 sm:p-2 md:p-4">
-          <ScrollArea className="w-full">
-            <div style={{ minWidth: "1600px" }}> {/* Increased min-width */}
-              <Calendar
-                mode="single" 
-                selected={targetDateForMove || undefined} 
-                onDayClick={handleDayClick}
-                month={currentMonth}
-                onMonthChange={setCurrentMonth}
-                className="p-0 w-full [&_table]:w-full [&_table]:border-collapse"
-                classNames={{
-                  months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 justify-center mb-4", // Added margin bottom for caption
-                  caption_label: "text-xl font-bold", // Increased caption font size
-                  head_row: "flex mt-4 w-full",
-                  head_cell: "w-[14.2857%] text-muted-foreground rounded-md p-2 text-lg font-medium", // Increased head cell font size
-                  row: "flex w-full mt-2",
-                  cell: "w-[14.2857%] h-52 text-sm p-0 relative [&:has([aria-selected])]:bg-accent/20 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20 border border-border", // Increased cell height to h-52
-                  day: "h-full w-full p-0 focus:relative focus:z-20 flex flex-col items-start justify-start hover:bg-accent/10 rounded-none", // Removed padding from day, will be handled by CustomDayContent
-                  day_selected: "bg-accent/30 text-accent-foreground font-bold",
-                  day_today: "bg-muted font-bold text-foreground",
-                  day_outside: "text-muted-foreground opacity-50 day-outside",
-                  day_disabled: "text-muted-foreground opacity-50 cursor-not-allowed",
-                  day_has_event: "font-semibold", 
-                  day_selected_event_original: "ring-2 ring-primary ring-inset", 
-                  table: "w-full border-collapse", 
-                }}
-                modifiers={modifiers}
-                modifiersClassNames={modifiersClassNames}
-                components={{
-                  DayContent: (props) => (
-                    <CustomDayContent
-                      date={props.date}
-                      displayMonth={props.displayMonth}
-                      eventsForDay={eventsByDate[format(props.date, 'yyyy-MM-dd')] || []}
-                      onSelectEvent={handleSelectEvent}
-                      selectedEventId={selectedFollowUp?.id}
-                    />
-                  ),
-                }}
-                showOutsideDays
-                fixedWeeks
-              />
-            </div>
-            <ScrollBar orientation="horizontal" />
-          </ScrollArea>
+          {/* Removed ScrollArea and div with minWidth to prevent horizontal scrolling */}
+          <Calendar
+            mode="single" 
+            selected={targetDateForMove || undefined} 
+            onDayClick={handleDayClick}
+            month={currentMonth}
+            onMonthChange={setCurrentMonth}
+            className="p-0 w-full [&_table]:w-full [&_table]:border-collapse" // Calendar itself is w-full
+            classNames={{
+              months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 justify-center mb-4",
+              caption_label: "text-xl font-bold",
+              head_row: "flex mt-4 w-full",
+              head_cell: "w-[14.2857%] text-muted-foreground rounded-md p-2 text-lg font-medium",
+              row: "flex w-full mt-2",
+              cell: "w-[14.2857%] h-64 text-sm p-0 relative [&:has([aria-selected])]:bg-accent/20 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20 border border-border", // Increased cell height to h-64
+              day: "h-full w-full p-0 focus:relative focus:z-20 flex flex-col items-start justify-start hover:bg-accent/10 rounded-none",
+              day_selected: "bg-accent/30 text-accent-foreground font-bold",
+              day_today: "bg-muted font-bold text-foreground",
+              day_outside: "text-muted-foreground opacity-50 day-outside",
+              day_disabled: "text-muted-foreground opacity-50 cursor-not-allowed",
+              day_has_event: "font-semibold", 
+              day_selected_event_original: "ring-2 ring-primary ring-inset", 
+              table: "w-full border-collapse", 
+            }}
+            modifiers={modifiers}
+            modifiersClassNames={modifiersClassNames}
+            components={{
+              DayContent: (props) => (
+                <CustomDayContent
+                  date={props.date}
+                  displayMonth={props.displayMonth}
+                  eventsForDay={eventsByDate[format(props.date, 'yyyy-MM-dd')] || []}
+                  onSelectEvent={handleSelectEvent}
+                  selectedEventId={selectedFollowUp?.id}
+                />
+              ),
+            }}
+            showOutsideDays
+            fixedWeeks
+          />
+          {/* Removed ScrollBar orientation="horizontal" */}
           <style jsx global>{`
             .day-has-event:not(.day-outside) {
               /* Visual cue for days with events, applied by modifier */
