@@ -27,9 +27,9 @@ const CustomDayContent: React.FC<{
   }
   return (
     <div className="flex flex-col h-full">
-      <span className="self-start mb-1">{format(date, 'd')}</span>
+      <span className="self-start mb-1 text-base">{format(date, 'd')}</span>
       {eventsForDay.length > 0 && (
-        <ScrollArea className="flex-grow h-20"> {/* Max height for event list */}
+        <ScrollArea className="flex-grow h-32"> {/* Max height for event list, adjusted from h-20 */}
           <div className="space-y-1 pr-1">
             {eventsForDay.map((event) => (
               <FollowUpEventItem
@@ -200,18 +200,18 @@ export default function CalendarPage() {
             className="p-0 w-full [&_table]:w-full [&_table]:border-collapse"
             classNames={{
               months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 justify-center",
-              caption_label: "text-xl font-medium",
+              caption_label: "text-xl font-medium", // Kept as is, already reasonably sized
               head_row: "flex mt-4 w-full",
-              head_cell: "w-[14.28%] text-muted-foreground rounded-md text-sm font-normal", // 100/7
+              head_cell: "w-[14.2857%] text-muted-foreground rounded-md p-2 text-base font-medium", // Adjusted from text-sm font-normal, added p-2
               row: "flex w-full mt-2",
-              cell: "w-[14.28%] h-32 text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent/20 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20 border border-border",
-              day: "h-full w-full p-1 focus:relative focus:z-20 flex flex-col items-start justify-start hover:bg-accent/10 rounded-none",
+              cell: "w-[14.2857%] h-40 text-sm p-0 relative [&:has([aria-selected])]:bg-accent/20 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20 border border-border", // h-40 from h-32, text-sm for base inside, removed text-center
+              day: "h-full w-full p-2 focus:relative focus:z-20 flex flex-col items-start justify-start hover:bg-accent/10 rounded-none", // p-2 from p-1
               day_selected: "bg-accent/30 text-accent-foreground font-bold",
               day_today: "bg-muted font-bold text-foreground",
               day_outside: "text-muted-foreground opacity-50 day-outside",
               day_disabled: "text-muted-foreground opacity-50 cursor-not-allowed",
-              day_has_event: "font-semibold", // Custom class, see styles below
-              day_selected_event_original: "ring-2 ring-primary ring-inset", // Custom class for selected event's original date
+              day_has_event: "font-semibold", 
+              day_selected_event_original: "ring-2 ring-primary ring-inset", 
             }}
             modifiers={modifiers}
             modifiersClassNames={modifiersClassNames}
@@ -232,11 +232,9 @@ export default function CalendarPage() {
           <style jsx global>{`
             .day-has-event:not(.day-outside) {
               /* Visual cue for days with events, applied by modifier */
-              /* Consider adding a dot or similar indicator via DayContent if needed */
             }
             .day-selected-event-original:not(.day-outside) {
               /* Visual cue for the original date of the selected event */
-              /* border: 2px solid hsl(var(--primary)); */
             }
             .rdp-tbody .rdp-row .rdp-cell:last-child {
               border-right: 1px solid hsl(var(--border));
@@ -266,3 +264,4 @@ export default function CalendarPage() {
     </div>
   );
 }
+

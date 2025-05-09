@@ -16,7 +16,7 @@ interface FollowUpEventItemProps {
 export function FollowUpEventItem({ event, onSelectEvent, isSelected }: FollowUpEventItemProps) {
   return (
     <Card 
-      className={`mb-2 p-2 cursor-pointer hover:shadow-md transition-shadow text-xs ${isSelected ? 'ring-2 ring-accent shadow-lg' : 'shadow-sm'}`}
+      className={`mb-2 p-2 cursor-pointer hover:shadow-md transition-shadow text-sm ${isSelected ? 'ring-2 ring-accent shadow-lg' : 'shadow-sm'}`} // Changed text-xs to text-sm
       onClick={() => onSelectEvent(event)}
       role="button"
       tabIndex={0}
@@ -38,3 +38,4 @@ export function FollowUpEventItem({ event, onSelectEvent, isSelected }: FollowUp
     </Card>
   );
 }
+
