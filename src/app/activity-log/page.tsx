@@ -98,7 +98,7 @@ export default function ActivityLogPage() {
           </CardContent>
         </Card>
       ) : (
-        <ScrollArea className="h-[calc(100vh-18rem)] rounded-md border shadow-lg bg-card">
+        <ScrollArea className="h-[calc(100vh-16rem)] rounded-md border shadow-lg bg-card"> {/* Adjusted height */}
           <div className="space-y-4 p-4">
             {filteredActivities.map(activity => (
               <Card key={activity.id} className="shadow-sm hover:shadow-md transition-shadow bg-background">

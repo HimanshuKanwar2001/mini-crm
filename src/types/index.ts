@@ -1,4 +1,5 @@
 
+
 export const LEAD_STATUSES = ["New", "Contacted", "Qualified", "Proposal Sent", "Converted", "Lost"] as const;
 export type LeadStatus = typeof LEAD_STATUSES[number];
 
@@ -44,9 +45,21 @@ export interface Activity {
   leadId: string; // Store the string representation of the Lead's ObjectId
   leadName: string;
   details?: {
-    oldValue?: string | string[];
-    newValue?: string | string[];
+    oldValue?: string | string[] | null; // Allow null for dates
+    newValue?: string | string[] | null; // Allow null for dates
     fieldName?: string;
     conversationType?: ConversationType;
   };
+}
+
+// Specific type for events on the calendar page
+export interface CalendarFollowUpEvent {
+  id: string; // Combination of leadId and conversationId for uniqueness
+  leadId: string;
+  leadName: string;
+  conversationId: string;
+  conversationType: ConversationType;
+  conversationSummary: string; 
+  date: Date; // Date object for easier manipulation with react-day-picker
+  originalData: Conversation; // Keep original conversation data if needed
 }
