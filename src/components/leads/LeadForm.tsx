@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useEffect } from 'react'; // Import useEffect
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -47,22 +48,48 @@ interface LeadFormProps {
 export function LeadForm({ onSubmit, defaultValues, isEditing = false }: LeadFormProps) {
   const form = useForm<LeadFormValues>({
     resolver: zodResolver(leadFormSchema),
+    // Initial default values for useForm - these are primarily set by useEffect/reset on prop changes
     defaultValues: {
-      name: defaultValues?.name || '',
-      email: defaultValues?.email || '',
-      linkedinProfileUrl: defaultValues?.linkedinProfileUrl || '',
-      company: defaultValues?.company || '',
-      notes: defaultValues?.notes || '',
-      tags: defaultValues?.tags?.join(', ') || '',
-      status: defaultValues?.status || 'New',
+      name: '',
+      email: '',
+      linkedinProfileUrl: '',
+      company: '',
+      notes: '',
+      tags: '',
+      status: 'New',
     },
   });
 
+  useEffect(() => {
+    // When defaultValues prop changes (e.g., opening dialog for a different lead or switching to add mode)
+    // reset the form with the new default values.
+    if (defaultValues && Object.keys(defaultValues).length > 0) {
+      form.reset({
+        name: defaultValues.name || '',
+        email: defaultValues.email || '',
+        linkedinProfileUrl: defaultValues.linkedinProfileUrl || '',
+        company: defaultValues.company || '',
+        notes: defaultValues.notes || '',
+        tags: defaultValues.tags ? defaultValues.tags.join(', ') : '', // Convert array to comma-separated string
+        status: defaultValues.status || 'New',
+      });
+    } else {
+      // For adding a new lead or if defaultValues is explicitly null/empty to clear the form
+      form.reset({
+        name: '',
+        email: '',
+        linkedinProfileUrl: '',
+        company: '',
+        notes: '',
+        tags: '',
+        status: 'New', // Default status for a new lead
+      });
+    }
+  }, [defaultValues, form]); // form.reset is stable, but including form ensures effect runs if form instance changes (though unlikely here)
+
   const handleSubmit = (values: LeadFormValues) => {
     onSubmit(values);
-    if (!isEditing) {
-      form.reset();
-    }
+    // Form reset is handled by the dialog closing and defaultValues changing for the next open.
   };
 
   return (
@@ -126,7 +153,7 @@ export function LeadForm({ onSubmit, defaultValues, isEditing = false }: LeadFor
           render={({ field }) => (
             <FormItem>
               <FormLabel>Status</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select lead status" />
